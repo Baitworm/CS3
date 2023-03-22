@@ -1,0 +1,71 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Scanner;
+import java.util.Set;
+
+public class Reachability {
+    static int reach(ArrayList<Integer>[] adj, int x, int y) {
+        //write your code here
+        return BFS(adj,x,y)? 1:0;
+    }
+     static boolean BFS(ArrayList<Integer>[] adj,int s, int g){
+        Queue<Integer> queue = new LinkedList<>();
+        Set<Integer> visited = new HashSet<>();
+        Map<Integer,Integer> parentMap = new HashMap<>();
+        visited.add(s);
+        queue.add(s);
+        while(!queue.isEmpty()){
+            Integer cur = queue.poll();
+            if(g == cur){return true;}
+            for(Integer yup : adj[cur]){
+                if(!visited.contains(yup)){
+                    visited.add(yup);
+                    parentMap.put(yup, cur);
+                    queue.add(yup);
+                }
+            }
+        }
+        return false;
+    }
+
+    public static void main(String[] args) throws FileNotFoundException {
+        Scanner file = new Scanner(new File("mediumG.txt"));
+        int n = file.nextInt();
+        int m = file.nextInt();
+        ArrayList<Integer>[] adj = (ArrayList<Integer>[]) new ArrayList[n];
+        adj = (ArrayList<Integer>[]) new ArrayList[n];
+        for (int i = 0; i < n; i++) {
+            adj[i] = new ArrayList<Integer>();
+        }
+        for (int i = 0; i < m; i++) {
+            int x, y;
+            x = file.nextInt();
+            y = file.nextInt();
+            adj[x].add(y);
+            adj[y].add(x);
+        }
+        System.out.println(reach(adj, 0, 250));
+        System.out.println(reach(adj, 10, 251));
+        System.out.println(reach(adj, 33, 252));
+        System.out.println(reach(adj, 156, 253));
+        System.out.println(reach(adj, 0, 249));
+        System.out.println(reach(adj, 1, 245));
+        System.out.println(reach(adj, 0, 242));
+        System.out.println(reach(adj, 0, 221));
+        System.out.println(reach(adj, 0, 200));
+        System.out.println(reach(adj, 123, 201));
+        System.out.println(reach(adj, 3, 25));
+        System.out.println(reach(adj, 62, 91));
+        System.out.println(reach(adj, 4, 25));
+        System.out.println(reach(adj, 10, 50));
+        System.out.println(reach(adj, 44, 150));
+        System.out.println(reach(adj, 77, 88));
+    }
+}
+
