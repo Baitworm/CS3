@@ -1,0 +1,81 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.Stack;
+
+public class StronglyConnected {
+    static int numberOfStronglyConnectedComponents(ArrayList<Integer>[] adj) {
+        //write your code here
+        Stack<Integer> stack = new Stack<>();
+        Set<Integer> visited = new HashSet<>();
+        for (int i = 0; i < adj.length; i++) {
+            if (!visited.contains(i)) {
+                DFS(adj, i, visited, stack);
+            }
+        }
+        ArrayList<Integer>[] reverseAdj = reverseGraph(adj);
+        int sccCount = 0;
+        visited.clear();
+        while (!stack.isEmpty()) {
+            int v = stack.pop();
+            if (!visited.contains(v)) {
+                DFS(reverseAdj, v, visited);
+                sccCount++;
+            }
+        }
+    
+        return sccCount;
+    }
+    
+    static ArrayList<Integer>[] reverseGraph(ArrayList<Integer>[] adj) {
+        ArrayList<Integer>[] reverseAdj = (ArrayList<Integer>[]) new ArrayList[adj.length];
+        for (int i = 0; i < adj.length; i++) {
+            reverseAdj[i] = new ArrayList<>();
+        }
+        for (int i = 0; i < adj.length; i++) {
+            for (int j = 0; j < adj[i].size(); j++) {
+                reverseAdj[adj[i].get(j)].add(i); // flip y and x
+            }
+        }
+        return reverseAdj;
+    }
+    static void DFS(ArrayList<Integer>[] adj,int v,Set<Integer> visited,Stack<Integer> stack){
+        visited.add(v);
+        for(Integer yup : adj[v]){
+            if(!visited.contains(yup)){
+                DFS(adj,yup,visited,stack);
+            }
+        }
+        stack.add(v);
+    }
+    static void DFS(ArrayList<Integer>[] adj,int v,Set<Integer> visited){ // for reverse
+        visited.add(v);
+        for(Integer yup : adj[v]){
+            if(!visited.contains(yup)){
+                DFS(adj,yup,visited);
+            }
+        }
+    }
+    
+    public static void main(String[] args) throws FileNotFoundException {
+        Scanner scanner = new Scanner(new File("med2DG.txt"));
+        int n = scanner.nextInt();
+        int m = scanner.nextInt();
+        ArrayList<Integer>[] adj = (ArrayList<Integer>[])new ArrayList[n];
+        for (int i = 0; i < n; i++) {
+            adj[i] = new ArrayList<Integer>();
+        }
+        for (int i = 0; i < m; i++) {
+            int x, y;
+            x = scanner.nextInt();
+            y = scanner.nextInt();
+            adj[x ].add(y);
+        }
+        System.out.println(numberOfStronglyConnectedComponents(adj));
+    }
+}
+
