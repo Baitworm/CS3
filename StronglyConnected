@@ -1,7 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
@@ -15,7 +14,7 @@ public class StronglyConnected {
         for (int i = 0; i < adj.length; i++) {
             if (!visited.contains(i)) {
                 DFS(adj, i, visited, stack);
-            }
+            }  
         }
         ArrayList<Integer>[] reverseAdj = reverseGraph(adj);
         int sccCount = 0;
@@ -30,7 +29,6 @@ public class StronglyConnected {
     
         return sccCount;
     }
-    
     static ArrayList<Integer>[] reverseGraph(ArrayList<Integer>[] adj) {
         ArrayList<Integer>[] reverseAdj = (ArrayList<Integer>[]) new ArrayList[adj.length];
         for (int i = 0; i < adj.length; i++) {
@@ -43,20 +41,38 @@ public class StronglyConnected {
         }
         return reverseAdj;
     }
-    static void DFS(ArrayList<Integer>[] adj,int v,Set<Integer> visited,Stack<Integer> stack){
-        visited.add(v);
-        for(Integer yup : adj[v]){
-            if(!visited.contains(yup)){
-                DFS(adj,yup,visited,stack);
+     
+        static void DFS(ArrayList<Integer>[] adj,int v,Set<Integer> visited,Stack<Integer> stack){
+            Stack<Integer> stack2 = new Stack<>();
+            stack2.push(v);
+            visited.add(v);
+            while(!stack2.isEmpty()){
+                int cur = stack2.peek();
+                boolean noNeighbor = false;
+                for (Integer yup : adj[cur]) {
+                    if (!visited.contains(yup)) {
+                        visited.add(yup);
+                        stack2.push(yup);
+                        noNeighbor = true;
+                        break;
+                    }
+                }
+                if (!noNeighbor) {
+                    stack.push(stack2.pop());
+                }
             }
         }
-        stack.add(v);
-    }
     static void DFS(ArrayList<Integer>[] adj,int v,Set<Integer> visited){ // for reverse
+        Stack<Integer> stack = new Stack<>();
         visited.add(v);
-        for(Integer yup : adj[v]){
-            if(!visited.contains(yup)){
-                DFS(adj,yup,visited);
+        stack.push(v);
+        while(!stack.isEmpty()) {
+            int cur = stack.pop();
+            for(Integer yup : adj[cur]){
+                if(!visited.contains(yup)) {
+                    visited.add(yup);
+                    stack.push(yup);
+                }
             }
         }
     }
@@ -73,9 +89,8 @@ public class StronglyConnected {
             int x, y;
             x = scanner.nextInt();
             y = scanner.nextInt();
-            adj[x ].add(y);
+            adj[x].add(y);
         }
         System.out.println(numberOfStronglyConnectedComponents(adj));
     }
 }
-
