@@ -1,0 +1,68 @@
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
+
+public class BFS {
+     static int distance(ArrayList<Integer>[] adj, int s, int t) {
+        //write your code here
+        return BFS(adj,s,t);
+    }
+    static int BFS(ArrayList<Integer>[] adj,int s, int g){
+        Queue<Integer> queue = new LinkedList<>();
+        Set<Integer> visited = new HashSet<>();
+        Map<Integer,Integer> parentMap = new HashMap<>();
+        visited.add(s);
+        queue.add(s);
+        while(!queue.isEmpty()){
+            Integer cur = queue.poll();
+            if(g == cur){return findLength(parentMap,s,g);}
+            for(Integer yup : adj[cur]){
+                if(!visited.contains(yup)){
+                    visited.add(yup);
+                    parentMap.put(yup, cur);
+                    queue.add(yup);
+                }
+            }
+        }
+        return -1;
+    }
+    static int findLength(Map<Integer,Integer> map,int s, int g){
+        int cur = g;
+        int count =1;
+        while(map.get(cur) != s){
+            if(map.get(cur) == s) break;
+            count++;
+            cur = map.get(cur);
+
+        }
+        return count;
+    }
+    public static void main(String[] args) throws FileNotFoundException {
+        Scanner scanner = new Scanner(new File("tinyG.txt"));
+        int n = scanner.nextInt();
+        int m = scanner.nextInt();
+        ArrayList<Integer>[] adj = (ArrayList<Integer>[])new ArrayList[n];
+        for (int i = 0; i < n; i++) {
+            adj[i] = new ArrayList<Integer>();
+        }
+        for (int i = 0; i < m; i++) {
+            int x, y;
+            x = scanner.nextInt();
+            y = scanner.nextInt();
+            adj[x ].add(y );
+            adj[y ].add(x );
+        }
+        System.out.println(distance(adj, 0, 4));
+        System.out.println(distance(adj, 2, 6));
+        System.out.println(distance(adj, 3, 5));
+        System.out.println(distance(adj, 7, 8));
+        System.out.println(distance(adj, 9, 12));
+        System.out.println(distance(adj, 10, 11));
+        System.out.println(distance(adj, 0, 9));
+        System.out.println(distance(adj, 2, 7));
+        System.out.println(distance(adj, 8, 11));
+        System.out.println(distance(adj, 4, 12));
+        System.out.println(distance(adj, 4, 2));
+    }
+}
+
