@@ -1,0 +1,24 @@
+import java.util.*;
+
+public class Change {
+    private static int getChange(int m) {
+        //write your code here
+        int[] coins = {10, 5, 1};
+        int count = 0;
+        for (int i = 0; i < coins.length; i++) {
+            count += m / coins[i];
+            m %= coins[i];
+            if (m == 0) {
+                break;
+            }
+        }
+        return count;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int m = scanner.nextInt();
+        System.out.println(getChange(m));
+    }
+}
+
