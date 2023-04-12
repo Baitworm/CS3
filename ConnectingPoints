@@ -1,0 +1,55 @@
+import java.util.*;
+
+public class ConnectingPoints {
+    private static double minimumDistance(int[] x, int[] y) {
+        double result = 0.;
+        Point[] points = new Point[x.length];
+        Map<Point,ArrayList<Point>> graph = new HashMap<>();
+        for (int i=0;i<x.length;i++){
+            Point p = new Point(x[i],y[i]);
+            points[i] = p;
+            graph.put(p,new ArrayList<Point>());
+        }
+        Set<Point> visited = new HashSet<>();
+        for(int i=0;i< points.length;i++){
+            for(int j=i+1;j<points.length;j++){
+                if (!visited.contains(points[j])){
+                    graph.get(points[i]).add(points[j]);
+                }
+            }
+            visited.add(points[i]);
+        }
+        PriorityQueue pq = new PriorityQueue(); // sort in ascending order
+        // prims
+        //write your code here
+        return result;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        int[] x = new int[n];
+        int[] y = new int[n];
+        for (int i = 0; i < n; i++) {
+            x[i] = scanner.nextInt();
+            y[i] = scanner.nextInt();
+        }
+        System.out.println(minimumDistance(x, y));
+    }
+}
+class Point{
+    private int x,y;
+    public Point(int x,int y){
+        this.x = x;
+        this.y = y;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public int getY() {
+        return y;
+    }
+}
+
