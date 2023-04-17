@@ -1,0 +1,87 @@
+import java.util.*;
+import java.awt.*;
+
+public class Clustering {
+    private static double clustering(int[] x, int[] y, int k) {
+        double result = -1.;
+        Queue<Edge> pq = new PriorityQueue<>();
+        for (int i = 0; i < x.length; i++) {
+            for (int j = i + 1; j < x.length; j++) {
+                double weight = Math.sqrt(Math.pow(x[i] - x[j], 2) + Math.pow(y[i] - y[j], 2));
+                pq.add(new Edge(i, j, weight));
+            }
+        }
+        UnionFind uf = new UnionFind(x.length);
+        int numClusters = x.length;
+        while (numClusters > k) {
+            Edge e = pq.poll();
+            if (uf.find(e.startIndex) != uf.find(e.endIndex)) {
+                uf.union(e.startIndex, e.endIndex);
+                numClusters--;
+            }
+        }
+        while (true) {
+            Edge e = pq.poll();
+            if (uf.find(e.startIndex) != uf.find(e.endIndex)) {
+                result = e.weight;
+                break;
+            }
+        }
+        return result;
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        int[] x = new int[n];
+        int[] y = new int[n];
+        for (int i = 0; i < n; i++) {
+            x[i] = scanner.nextInt();
+            y[i] = scanner.nextInt();
+        }
+        int k = scanner.nextInt();
+        System.out.println(clustering(x, y, k));
+    }
+}
+class UnionFind {
+    int[] parent;
+
+    public UnionFind(int n) {
+        parent = new int[n];
+        for (int i = 0; i < n; i++) {
+            parent[i] = i;
+        }
+    }
+
+    public int find(int x) {
+        while (x != parent[x]) {
+            parent[x] = parent[parent[x]]; // path compression
+            x = parent[x];
+        }
+        return x;
+    }
+
+    public void union(int x, int y) {
+        int rootX = find(x);
+        int rootY = find(y);
+        if (rootX != rootY) {
+            parent[rootX] = rootY;
+        }
+    }
+}
+class Edge implements Comparable<Edge> {
+    int startIndex;
+    int endIndex;
+    double weight;
+
+    public Edge(int i, int j, double w) {
+        startIndex = i;
+        endIndex = j;
+        weight = w;
+    }
+
+    @Override
+    public int compareTo(Edge other) {
+        return Double.compare(this.weight, other.weight);
+    }
+}
