@@ -1,42 +1,34 @@
-import java.util.*;
 import java.awt.*;
+import java.util.*;
+
 public class ConnectingPoints {
     private static double minimumDistance(int[] x, int[] y) {
         double result = 0.;
         Point[] points = new Point[x.length];
-        Map<Point, ArrayList<Point>> graph = new HashMap<>();
-        for (int i = 0; i < x.length; i++) {
-            Point p = new Point(x[i], y[i]);
+        Map<Point,ArrayList<Edge>> graph = new HashMap<>();
+        for (int i=0;i<x.length;i++){
+            Point p = new Point(x[i],y[i]);
             points[i] = p;
-            graph.put(p, new ArrayList<Point>());
+            graph.put(p,new ArrayList<>());
         }
-        Set<Point> visited = new HashSet<>();
-        for (int i=0;i<points.length;i++){
-            for(int j=i+1;j<points.length;j++){
-                if (!visited.contains(points[j])){
-                    graph.get(points[i]).add(points[j]);
-                }
-            }
-            visited.add(points[i]);
-        }
-        visited.clear();
-        PriorityQueue<Edge> pq = new PriorityQueue<>();
-        for (Point p : graph.get(points[0])) {
-            pq.add(new Edge(points[0], p));
-        }
-        while (!pq.isEmpty() && visited.size() < points.length) {
-            Edge e = pq.poll();
-            Point next = e.end;
-            if (!visited.contains(next)) {
-                visited.add(next);
-                result += e.weight;
-                for (Point p : graph.get(next)) {
-                    if (!visited.contains(p)) {
-                        pq.add(new Edge(next, p));
-                    }
-                }
+        for(int i = 0; i< points.length; i++){
+            for(int j = i+1; j< points.length; j++){
+                graph.get(points[i]).add(new Edge(points[i],points[j]));
+                graph.get(points[j]).add(new Edge(points[i],points[j]));
             }
         }
+        Set<Edge> visited = new HashSet<>();
+        Queue<Edge> pq  = new PriorityQueue<>();
+        pq.addAll(graph.get(points[0]));
+        Edge curShortest;
+        
+        do{
+            curShortest = pq.poll();
+        } while (!pq.isEmpty() && visited.contains(curShortest));
+        visited.add(curShortest);
+        result+= curShortest.getDistance();
+        
+        //write your code here
         return result;
     }
 
@@ -53,22 +45,28 @@ public class ConnectingPoints {
     }
 }
 class Edge implements Comparable<Edge> {
-    Point start;
-    Point end;
-    double weight;
+    private Point p1,p2;
+    private double weight;
+    public Edge(Point p1, Point p2){
+        this.p1 = p1;
+        this.p2 = p2;
+        weight = getDistance();
+    }
+    public double getDistance(){
+        return p1.distance(p2);
+    }
 
-    public Edge(Point s, Point e) {
-        start = s;
-        end = e;
-        weight = distance(s, e);
+    public Point getP2() {
+        return p2;
+    }
+
+    public double getWeight() {
+        return weight;
     }
 
     @Override
-    public int compareTo(Edge other) {
-        return Double.compare(this.weight, other.weight);
-    }
-
-    private double distance(Point a, Point b) {
-        return start.distance(end);
+    public int compareTo(Edge o) {
+        return weight < o.getWeight() ? -1 : weight == o.getWeight() ? 0 : 1;
     }
 }
+
