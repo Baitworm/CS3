@@ -5,36 +5,32 @@ public class ConnectingPoints {
     private static double minimumDistance(int[] x, int[] y) {
         double result = 0.;
         Point[] points = new Point[x.length];
-        Map<Point,ArrayList<Edge>> graph = new HashMap<>();
-        for (int i=0;i<x.length;i++){
-            Point p = new Point(x[i],y[i]);
+        Map<Point, ArrayList<Edge>> graph = new HashMap<>();
+        for (int i = 0; i < x.length; i++) {
+            Point p = new Point(x[i], y[i]);
             points[i] = p;
-            graph.put(p,new ArrayList<>());
+            graph.put(p, new ArrayList<>());
         }
-        for(int i = 0; i< points.length; i++){
-            for(int j = i+1; j< points.length; j++){
-                graph.get(points[i]).add(new Edge(points[i],points[j]));
-                graph.get(points[j]).add(new Edge(points[i],points[j]));
+        for (int i = 0; i < points.length; i++) {
+            for (int j = i + 1; j < points.length; j++) {
+                graph.get(points[i]).add(new Edge(points[i], points[j]));
+                graph.get(points[j]).add(new Edge(points[j], points[i])); 
             }
         }
-        Set<Edge> visited = new HashSet<>();
-        Queue<Edge> pq  = new PriorityQueue<>();
+        Set<Point> visited = new HashSet<>();
+        PriorityQueue<Edge> pq = new PriorityQueue<>();
         pq.addAll(graph.get(points[0]));
-        Edge curShortest;
-        while(visited.size() < x.length){
-            do {
-                curShortest = pq.poll();
-            }while(visited.contains(curShortest) && !pq.isEmpty());
-            System.out.print("Start: " + curShortest.getP1().x + " " + curShortest.getP1().y +" ");
-            System.out.print("End: " + curShortest.getP2().x + " " + curShortest.getP2().y +" ");
-            pq.addAll(graph.get(curShortest.getP2()));
-            System.out.println("Dist: " + curShortest.getDistance());
-            result += curShortest.getDistance();
-            visited.add(curShortest);
+        visited.add(points[0]);
+        while (!pq.isEmpty()) {
+            Edge curShortest = pq.poll();
+            Point endPoint = curShortest.getP2();
+            if (!visited.contains(endPoint)) {
+                result += curShortest.getDistance();
+                visited.add(endPoint);
+                pq.addAll(graph.get(endPoint));
+            }
         }
-
-
-        //write your code here
+        // write your code here
         return result;
     }
 
@@ -49,33 +45,32 @@ public class ConnectingPoints {
         }
         System.out.println(minimumDistance(x, y));
     }
+    static class Edge implements Comparable<Edge> {
+        private Point p1,p2;
+        private double weight;
+        public Edge(Point p1, Point p2){
+            this.p1 = p1;
+            this.p2 = p2;
+            weight = getDistance();
+        }
+        public double getDistance(){
+            return p1.distance(p2);
+        }
+
+        public Point getP2() {
+            return p2;
+        }
+        public Point getP1() {
+            return p1;
+        }
+
+        public double getWeight() {
+            return weight;
+        }
+
+        @Override
+        public int compareTo(Edge o) {
+            return Double.compare(weight,o.getWeight());
+        }
+    }
 }
-class Edge implements Comparable<Edge> {
-    private Point p1,p2;
-    private double weight;
-    public Edge(Point p1, Point p2){
-        this.p1 = p1;
-        this.p2 = p2;
-        weight = getDistance();
-    }
-    public double getDistance(){
-        return p1.distance(p2);
-    }
-
-    public Point getP2() {
-        return p2;
-    }
-    public Point getP1() {
-        return p1;
-    }
-
-    public double getWeight() {
-        return weight;
-    }
-
-    @Override
-    public int compareTo(Edge o) {
-        return Double.compare(weight,o.getWeight());
-    }
-}
-
