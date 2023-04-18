@@ -21,13 +21,19 @@ public class ConnectingPoints {
         Queue<Edge> pq  = new PriorityQueue<>();
         pq.addAll(graph.get(points[0]));
         Edge curShortest;
-        
-        do{
-            curShortest = pq.poll();
-        } while (!pq.isEmpty() && visited.contains(curShortest));
-        visited.add(curShortest);
-        result+= curShortest.getDistance();
-        
+        while(visited.size() < x.length){
+            do {
+                curShortest = pq.poll();
+            }while(visited.contains(curShortest) && !pq.isEmpty());
+            System.out.print("Start: " + curShortest.getP1().x + " " + curShortest.getP1().y +" ");
+            System.out.print("End: " + curShortest.getP2().x + " " + curShortest.getP2().y +" ");
+            pq.addAll(graph.get(curShortest.getP2()));
+            System.out.println("Dist: " + curShortest.getDistance());
+            result += curShortest.getDistance();
+            visited.add(curShortest);
+        }
+
+
         //write your code here
         return result;
     }
@@ -59,6 +65,9 @@ class Edge implements Comparable<Edge> {
     public Point getP2() {
         return p2;
     }
+    public Point getP1() {
+        return p1;
+    }
 
     public double getWeight() {
         return weight;
@@ -66,7 +75,7 @@ class Edge implements Comparable<Edge> {
 
     @Override
     public int compareTo(Edge o) {
-        return weight < o.getWeight() ? -1 : weight == o.getWeight() ? 0 : 1;
+        return Double.compare(weight,o.getWeight());
     }
 }
 
