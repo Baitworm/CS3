@@ -2,7 +2,7 @@ import java.awt.*;
 import java.util.*;
 
 public class ConnectingPoints {
-    private static double minimumDistance(int[] x, int[] y) {
+    public static double minimumDistance(int[] x, int[] y) {
         double result = 0.;
         Point[] points = new Point[x.length];
         Map<Point, ArrayList<Edge>> graph = new HashMap<>();
