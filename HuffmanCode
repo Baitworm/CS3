@@ -1,11 +1,10 @@
 import java.io.PrintStream;
-import java.util.PriorityQueue;
-import java.util.Queue;
-import java.util.Scanner;
+import java.util.*;
 
 public class HuffmanCode {
     private int[] freq;
-    Queue<Node> pq;
+    private Map<Integer,Integer> binaryCharMap;
+    private Queue<Node> pq;
     public HuffmanCode(int[] count) {
         freq = count;
         pq = new PriorityQueue();
@@ -19,8 +18,8 @@ public class HuffmanCode {
             Node min1 = pq.poll();
             Node min2 = pq.poll();
             if(min2 != null){
-                Node holder = new Node(min1.getFreq()+min2.getFreq());
-                if(min2.compareTo(min1) == -1){
+                Node holder = new Node(min1.getFrequencyOfCharacter()+min2.getFrequencyOfCharacter());
+                if(min2.compareTo(min1) <= 0){
                     holder.setLeft(min2);
                     holder.setRight(min1);
                 }else {
@@ -33,56 +32,32 @@ public class HuffmanCode {
 
     }
     public HuffmanCode(Scanner codeInput) {
-        int[] temp = new int[255];
+        binaryCharMap = new HashMap<>();
         while(codeInput.hasNextInt()){
-            temp[codeInput.nextInt()] = codeInput.nextInt();
+            int character = codeInput.nextInt();
+            int binary = codeInput.nextInt(); 
+            binaryCharMap.put(binary, character);
         }
-        pq = new PriorityQueue();
-        for (int i=0;i<temp.length;i++){
-            if(temp[i] == 0) continue;
-            Node tempNode = new Node(temp[i]);
-            tempNode.setCharacter(i);
-            pq.add(tempNode);
-        }
-        do {
-            Node min1 = pq.poll();
-            Node min2 = pq.poll();
-            if(min2 != null){
-                Node holder = new Node(min1.getFreq()+min2.getFreq());
-                if(min2.compareTo(min1) == -1){
-                    holder.setLeft(min2);
-                    holder.setRight(min1);
-                }else {
-                    holder.setRight(min2);
-                    holder.setLeft(min1);
-                }
-                pq.add(holder);
-            }
-        } while(pq.size()!=1);
     }
 
     public void save(PrintStream output) {
-        for (int i=0;i<freq.length;i++){
-            if(freq[i] == 0) continue;
-            output.println(i);
-            output.println(makeBinary(i,pq.peek(),""));
+        //printNodesRightToLeft(pq.peek());
+        saveFromLeftToRight(pq.peek(), "", output);
+    }
+    private void saveFromLeftToRight(Node n, String curBinary, PrintStream output) {
+        if (n.getLeft() == null && n.getRight() == null) {
+            output.println(n.getCharacter() + "\n" + curBinary);
+        }
+    
+        if (n.getLeft() != null) {
+            saveFromLeftToRight(n.getLeft(), curBinary + "0", output);
+        }
+    
+        if (n.getRight() != null) {
+            saveFromLeftToRight(n.getRight(), curBinary + "1", output);
         }
     }
-    private String makeBinary(int character,Node n, String curBinary){
-        if (n.getCharacter() == character) {
-            return curBinary;
-        }
-        if(n.getRight() != null && n.getLeft() != null){
-            return makeBinary(character,n.getRight(),curBinary+"1") + makeBinary(character,n.getLeft(),curBinary+"0");
-        }
-        if(n.getRight() != null){
-            return makeBinary(character,n.getRight(),curBinary+"1");
-        }
-        if(n.getLeft() != null){
-            return makeBinary(character,n.getLeft(),curBinary+"0");
-        }
-        return "";
-    }
+    
     public void translate(BitInputStream input, PrintStream output) {
         String translated = "";
         String curBinary = "";
@@ -90,31 +65,25 @@ public class HuffmanCode {
             int bit = input.nextBit();
             curBinary+=bit;
             if (checkIfLetter(curBinary) != -1) {
-                translated += (char)checkIfLetter(curBinary);
-                curBinary = "";
+                translated+=((char)checkIfLetter(curBinary));
+                curBinary="";
             }
         }
-        output.println(translated);
+        output.print(translated.toString());
     }
     private int checkIfLetter(String curBinary){
-        Node root = pq.peek();
-        for(int i=0;i<curBinary.length();i++){
-            char curNum = curBinary.charAt(i);
-            if(curNum == '1'){
-                root = root.getRight();
-            }
-            if(curNum == '0'){
-                root = root.getLeft();
-            }
+        if (binaryCharMap.containsKey(Integer.parseInt(curBinary))){
+            return binaryCharMap.get(Integer.parseInt(curBinary));
         }
-        return root.getCharacter();
+        return -1;
     }
+    
     private class Node implements Comparable<Node>{
         private Node left,right;
         private int character;
-        private int freq;
+        private int frequencyOfCharacter;
         public Node(int freq){
-            this.freq = freq;
+            this.frequencyOfCharacter = freq;
             character = -1;
         }
 
@@ -130,8 +99,8 @@ public class HuffmanCode {
             return character;
         }
 
-        public int getFreq() {
-            return freq;
+        public int getFrequencyOfCharacter() {
+            return frequencyOfCharacter;
         }
 
         public void setLeft(Node left) {
@@ -148,7 +117,7 @@ public class HuffmanCode {
 
         @Override
         public int compareTo(Node o) {
-            return Integer.compare(freq,o.getFreq());
+            return Integer.compare(frequencyOfCharacter,o.getFrequencyOfCharacter());
         }
     }
 }
