@@ -1,0 +1,154 @@
+import java.io.PrintStream;
+import java.util.PriorityQueue;
+import java.util.Queue;
+import java.util.Scanner;
+
+public class HuffmanCode {
+    private int[] freq;
+    Queue<Node> pq;
+    public HuffmanCode(int[] count) {
+        freq = count;
+        pq = new PriorityQueue();
+        for (int i=0;i<freq.length;i++){
+            if(freq[i] == 0) continue;
+            Node tempNode = new Node(freq[i]);
+            tempNode.setCharacter(i);
+            pq.add(tempNode);
+        }
+        do {
+            Node min1 = pq.poll();
+            Node min2 = pq.poll();
+            if(min2 != null){
+                Node holder = new Node(min1.getFreq()+min2.getFreq());
+                if(min2.compareTo(min1) == -1){
+                    holder.setLeft(min2);
+                    holder.setRight(min1);
+                }else {
+                    holder.setRight(min2);
+                    holder.setLeft(min1);
+                }
+                pq.add(holder);
+            }
+        } while(pq.size()!=1);
+
+    }
+    public HuffmanCode(Scanner codeInput) {
+        int[] temp = new int[255];
+        while(codeInput.hasNextInt()){
+            temp[codeInput.nextInt()] = codeInput.nextInt();
+        }
+        pq = new PriorityQueue();
+        for (int i=0;i<temp.length;i++){
+            if(temp[i] == 0) continue;
+            Node tempNode = new Node(temp[i]);
+            tempNode.setCharacter(i);
+            pq.add(tempNode);
+        }
+        do {
+            Node min1 = pq.poll();
+            Node min2 = pq.poll();
+            if(min2 != null){
+                Node holder = new Node(min1.getFreq()+min2.getFreq());
+                if(min2.compareTo(min1) == -1){
+                    holder.setLeft(min2);
+                    holder.setRight(min1);
+                }else {
+                    holder.setRight(min2);
+                    holder.setLeft(min1);
+                }
+                pq.add(holder);
+            }
+        } while(pq.size()!=1);
+    }
+
+    public void save(PrintStream output) {
+        for (int i=0;i<freq.length;i++){
+            if(freq[i] == 0) continue;
+            output.println(i);
+            output.println(makeBinary(i,pq.peek(),""));
+        }
+    }
+    private String makeBinary(int character,Node n, String curBinary){
+        if (n.getCharacter() == character) {
+            return curBinary;
+        }
+        if(n.getRight() != null && n.getLeft() != null){
+            return makeBinary(character,n.getRight(),curBinary+"1") + makeBinary(character,n.getLeft(),curBinary+"0");
+        }
+        if(n.getRight() != null){
+            return makeBinary(character,n.getRight(),curBinary+"1");
+        }
+        if(n.getLeft() != null){
+            return makeBinary(character,n.getLeft(),curBinary+"0");
+        }
+        return "";
+    }
+    public void translate(BitInputStream input, PrintStream output) {
+        String translated = "";
+        String curBinary = "";
+        while(input.hasNextBit()){
+            int bit = input.nextBit();
+            curBinary+=bit;
+            if (checkIfLetter(curBinary) != -1) {
+                translated += (char)checkIfLetter(curBinary);
+                curBinary = "";
+            }
+        }
+        output.println(translated);
+    }
+    private int checkIfLetter(String curBinary){
+        Node root = pq.peek();
+        for(int i=0;i<curBinary.length();i++){
+            char curNum = curBinary.charAt(i);
+            if(curNum == '1'){
+                root = root.getRight();
+            }
+            if(curNum == '0'){
+                root = root.getLeft();
+            }
+        }
+        return root.getCharacter();
+    }
+    private class Node implements Comparable<Node>{
+        private Node left,right;
+        private int character;
+        private int freq;
+        public Node(int freq){
+            this.freq = freq;
+            character = -1;
+        }
+
+        public Node getLeft() {
+            return left;
+        }
+
+        public Node getRight() {
+            return right;
+        }
+
+        public int getCharacter() {
+            return character;
+        }
+
+        public int getFreq() {
+            return freq;
+        }
+
+        public void setLeft(Node left) {
+            this.left = left;
+        }
+
+        public void setRight(Node right) {
+            this.right = right;
+        }
+
+        public void setCharacter(int character) {
+            this.character = character;
+        }
+
+        @Override
+        public int compareTo(Node o) {
+            return Integer.compare(freq,o.getFreq());
+        }
+    }
+}
