@@ -3,7 +3,7 @@ import java.util.*;
 
 public class HuffmanCode {
     private int[] freq;
-    private Map<Integer,Integer> binaryCharMap;
+    private Map<String,Integer> binaryCharMap;
     private Queue<Node> pq;
     public HuffmanCode(int[] count) {
         freq = count;
@@ -19,7 +19,7 @@ public class HuffmanCode {
             Node min2 = pq.poll();
             if(min2 != null){
                 Node holder = new Node(min1.getFrequencyOfCharacter()+min2.getFrequencyOfCharacter());
-                if(min2.compareTo(min1) <= 0){
+                if(min2.compareTo(min1) == -1){
                     holder.setLeft(min2);
                     holder.setRight(min1);
                 }else {
@@ -33,10 +33,10 @@ public class HuffmanCode {
     }
     public HuffmanCode(Scanner codeInput) {
         binaryCharMap = new HashMap<>();
-        while(codeInput.hasNextInt()){
-            int character = codeInput.nextInt();
-            int binary = codeInput.nextInt(); 
-            binaryCharMap.put(binary, character);
+        while(codeInput.hasNextLine()){
+            String character = codeInput.nextLine();
+            String binary = codeInput.nextLine();
+            binaryCharMap.put(binary, Integer.parseInt(character));
         }
     }
 
@@ -46,18 +46,19 @@ public class HuffmanCode {
     }
     private void saveFromLeftToRight(Node n, String curBinary, PrintStream output) {
         if (n.getLeft() == null && n.getRight() == null) {
-            output.println(n.getCharacter() + "\n" + curBinary);
+            output.println(n.getCharacter());
+            output.println(curBinary);
         }
-    
+
         if (n.getLeft() != null) {
             saveFromLeftToRight(n.getLeft(), curBinary + "0", output);
         }
-    
+
         if (n.getRight() != null) {
             saveFromLeftToRight(n.getRight(), curBinary + "1", output);
         }
     }
-    
+
     public void translate(BitInputStream input, PrintStream output) {
         String translated = "";
         String curBinary = "";
@@ -69,15 +70,15 @@ public class HuffmanCode {
                 curBinary="";
             }
         }
-        output.print(translated.toString());
+        output.print(translated);
     }
     private int checkIfLetter(String curBinary){
-        if (binaryCharMap.containsKey(Integer.parseInt(curBinary))){
-            return binaryCharMap.get(Integer.parseInt(curBinary));
+        if (binaryCharMap.containsKey(curBinary)){
+            return binaryCharMap.get(curBinary);
         }
         return -1;
     }
-    
+
     private class Node implements Comparable<Node>{
         private Node left,right;
         private int character;
